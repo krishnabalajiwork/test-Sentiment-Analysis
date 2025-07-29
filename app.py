@@ -1,300 +1,159 @@
 # ─────────────────────────────────────────────────────────────
-#  BTS Comment Sentiment Analyzer – Clean & Professional UI
+#  BTS Sentiment Analyzer – Colour-Fix & Sidebar-Fix Edition
 # ─────────────────────────────────────────────────────────────
 import streamlit as st
 import pandas as pd
-import nltk
+import nltk, pathlib
 from nltk.sentiment import SentimentIntensityAnalyzer
-import pathlib
-
-nltk.download('vader_lexicon', quiet=True)
+nltk.download("vader_lexicon", quiet=True)
 sia = SentimentIntensityAnalyzer()
 
-# ─── Page Configuration ─────────────────────────────────────
-st.set_page_config(
-    page_title="💜 BTS Sentiment", 
-    page_icon="🎤", 
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
-
+# ─── Theme values ────────────────────────────────────────────
 PRIMARY_PURPLE = "#8E44AD"
-LIGHT_PURPLE = "#9B59B6"
+DARK_TEXT      = "#2C2C2C"          # universal on-light text
+LAVENDER_BG    = "#F8F5FB"
 
-# ─── Enhanced Styling ────────────────────────────────────────
+st.set_page_config(page_title="💜 BTS Sentiment",
+                   page_icon="🎤",
+                   layout="wide")
+
+# ─── GLOBAL STYLE FIXES (all colour problems resolved) ───────
 st.markdown(f"""
 <style>
-/* Global App Styling */
-.stApp {{
-    background-color: #F8F5FB;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+/* ---------- GLOBAL COLOURS ---------- */
+.stApp {{background:{LAVENDER_BG}; color:{DARK_TEXT};}}
+h1,h2,h3,h4,h5,h6, .markdown-text-container * {{color:{DARK_TEXT} !important;}}
+
+/* ---------- SIDEBAR ---------- */
+[data-testid="stSidebar"]>div:first-child {{
+    background:{PRIMARY_PURPLE};
+    color:#FFF;
+}}
+[data-testid="stSidebar"]>div:not(:first-child) {{
+    background:#EFE6F7;
+}}
+[data-testid="stSidebar"] * {{color:{DARK_TEXT}!important;}}
+/* ensure metrics wrap instead of being cut off */
+[data-testid="stMetric"] div {{
+    white-space: normal;
 }}
 
-/* Sidebar Styling */
-[data-testid="stSidebar"] > div:first-child {{
-    background: linear-gradient(180deg, {PRIMARY_PURPLE} 0%, {LIGHT_PURPLE} 100%);
-    color: #FFFFFF;
-}}
-[data-testid="stSidebar"] * {{
-    color: #FFFFFF !important;
-}}
-
-/* Header Banner */
+/* ---------- HEADER ---------- */
 .bts-header {{
-    background: linear-gradient(135deg, {PRIMARY_PURPLE} 0%, {LIGHT_PURPLE} 100%);
-    padding: 2.5rem 2rem;
-    border-radius: 15px;
-    text-align: center;
-    color: #FFFFFF;
-    margin-bottom: 2rem;
-    box-shadow: 0 8px 32px rgba(142, 68, 173, 0.3);
+  background:{PRIMARY_PURPLE};
+  padding:1.6rem 1rem;
+  border-radius:10px;
+  text-align:center;
+  color:#FFF;
+  margin-bottom:1.6rem;
 }}
 
-.bts-header h1 {{
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-}}
-
-.bts-header p {{
-    font-size: 1.2rem;
-    opacity: 0.9;
-}}
-
-/* Input Field Styling */
-.stTextInput > div > div > input {{
-    background: linear-gradient(90deg, #ffffff 0%, #f7e9fb 100%);
-    border: 2px solid {PRIMARY_PURPLE};
-    border-radius: 12px;
-    padding: 1rem;
-    font-size: 1.1rem;
-    color: #333;
-}}
-
-.stTextInput > div > div > input:focus {{
-    border-color: {LIGHT_PURPLE};
-    box-shadow: 0 0 0 3px rgba(142, 68, 173, 0.2);
-}}
-
-/* Result Card */
+/* ---------- RESULT CARD ---------- */
 .result-card {{
-    width: 100%;
-    border-radius: 20px;
-    padding: 3rem 2rem;
-    text-align: center;
-    color: #FFFFFF;
-    font-size: 2.8rem;
-    font-weight: 800;
-    margin: 2rem 0;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-    animation: slideIn 0.5s ease-out;
+  width:100%;
+  border-radius:16px;
+  padding:2.4rem;
+  margin-top:1rem;
+  text-align:center;
+  color:#FFF;
+  font-size:2.2rem;
+  font-weight:800;
+  box-shadow:0 2px 16px #0002;
 }}
 
-@keyframes slideIn {{
-    from {{
-        opacity: 0;
-        transform: translateY(20px);
-    }}
-    to {{
-        opacity: 1;
-        transform: translateY(0);
-    }}
+/* ---------- INPUT FIELD ---------- */
+input[type='text'] {{
+  background:#EFE6F7;
+  border:2px solid {PRIMARY_PURPLE};
+  border-radius:12px;
+  padding:0.6rem 1rem;
+  font-size:1.05rem;
+  color:{DARK_TEXT};
 }}
-
-/* Button Styling */
-.stButton > button {{
-    background: linear-gradient(135deg, {PRIMARY_PURPLE} 0%, {LIGHT_PURPLE} 100%);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    padding: 0.75rem 2rem;
-    font-size: 1.1rem;
-    font-weight: 600;
-    transition: all 0.3s ease;
+input[type='text']::placeholder {{
+  color:#6E5A80;
+  opacity:1;
 }}
-
-.stButton > button:hover {{
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(142, 68, 173, 0.4);
-}}
-
-/* Metrics */
-.metric-container {{
-    background: rgba(255, 255, 255, 0.1);
-    padding: 1rem;
-    border-radius: 10px;
-    margin: 1rem 0;
+input[type='text']:focus {{
+  outline:none;
+  border:2px solid #9054D6;
 }}
 </style>
 """, unsafe_allow_html=True)
 
-# ─── VADER Sentiment Classification ──────────────────────────
-def classify_sentiment(text):
-    """Classify sentiment using VADER with improved thresholds."""
-    scores = sia.polarity_scores(text)
-    compound = scores['compound']
-    
-    if compound >= 0.15:
-        return "Positive", compound, scores
-    elif compound <= -0.15:
-        return "Negative", compound, scores
-    else:
-        return "Neutral", compound, scores
+# ─── Helper: VADER prediction ────────────────────────────────
+def vader_predict(text):
+    score = sia.polarity_scores(text)["compound"]
+    if score > 0.2:
+        return "Positive", score
+    if score < -0.2:
+        return "Negative", score
+    return "Neutral", score
 
-# ─── Dataset Loading ─────────────────────────────────────────
-DATA_CANDIDATES = ["bts_2021_1.csv", "data/bts_2021_1.csv"]
-csv_path = next((p for p in DATA_CANDIDATES if pathlib.Path(p).exists()), None)
+# ─── Optional dataset stats ──────────────────────────────────
+csv_path = next((p for p in ["bts_2021_1.csv","data/bts_2021_1.csv"]
+                 if pathlib.Path(p).exists()), None)
 total_comments = 0
-
 if csv_path:
     try:
         df = pd.read_csv(csv_path, low_memory=False).dropna(subset=["comment_text"])
         total_comments = len(df)
     except Exception:
-        df = pd.DataFrame()
+        pass
 
-# ─── Header Section ──────────────────────────────────────────
+# ─── HEADER ─────────────────────────────────────────────────
 st.markdown("""
 <div class="bts-header">
-    <h1>💜 BTS Comment Sentiment Analyzer</h1>
-    <p>Advanced AI-powered sentiment analysis for BTS fans worldwide</p>
+  <h1>🎤 Sentiment Analysis</h1>
+  <p>Type any sentence about BTS and get instant feedback!</p>
 </div>
 """, unsafe_allow_html=True)
 
-# ─── Sidebar: Clean Stats & Info ─────────────────────────────
-with st.sidebar:
-    st.markdown("## 📊 App Statistics")
-    
-    col1, col2 = st.columns(2)
-    with col1:
-        st.metric("Dataset Size", f"{total_comments:,}")
-    with col2:
-        st.metric("Model", "VADER")
-    
-    st.markdown("---")
-    
-    st.markdown("## 💜 About BTS")
-    st.markdown("""
-    **Members:** RM, Jin, Suga, J-Hope, Jimin, V, Jungkook
-    
-    **Debut:** June 13, 2013
-    
-    **Fandom:** ARMY 💜
-    
-    **Genre:** K-pop, Hip hop, R&B
-    """)
-    
-    st.markdown("---")
-    
-    # Display BTS cartoons if available (FIXED: use_container_width instead of use_column_width)
-    img_dir = pathlib.Path("images")
-    if img_dir.exists():
-        cartoon_imgs = sorted(img_dir.glob("*.*"))
-        if cartoon_imgs:
-            st.markdown("## 🎨 BTS Gallery")
-            for img in cartoon_imgs:
-                st.image(str(img), use_container_width=True)
+# ─── LAYOUT ─────────────────────────────────────────────────
+left, right = st.columns([2,1])
 
-# ─── Main Content Area ───────────────────────────────────────
-st.markdown("## 💬 Sentiment Analysis")
-
-# Input section
-user_text = st.text_input(
-    "",
-    placeholder="Enter your comment about BTS here... (e.g., 'I love their new album so much!')",
-    help="Type any comment about BTS and get instant sentiment analysis",
-    key="user_input"
-)
-
-# Prediction button and results
-col1, col2, col3 = st.columns([1, 2, 1])
-
-with col2:
-    if st.button("🔮 Analyze Sentiment", type="primary", use_container_width=True):
+with left:
+    st.markdown("### 📝 Enter your comment about BTS here...")
+    user_text = st.text_input("", key="input")
+    if st.button("Predict", type="primary"):
         if not user_text.strip():
-            st.warning("⚠️ Please enter a comment to analyze.")
+            st.warning("Please type something first!")
         else:
-            with st.spinner("Analyzing sentiment..."):
-                sentiment, compound, detailed_scores = classify_sentiment(user_text)
-                
-                # Choose emoji and gradient based on sentiment
-                sentiment_config = {
-                    "Positive": {
-                        "emoji": "😊",
-                        "gradient": "linear-gradient(135deg, #2ecc71 0%, #8E44AD 100%)"
-                    },
-                    "Negative": {
-                        "emoji": "😞", 
-                        "gradient": "linear-gradient(135deg, #e74c3c 0%, #8E44AD 100%)"
-                    },
-                    "Neutral": {
-                        "emoji": "😐",
-                        "gradient": "linear-gradient(135deg, #95a5a6 0%, #8E44AD 100%)"
-                    }
-                }
-                
-                config = sentiment_config[sentiment]
-                
-                # Display result card
-                st.markdown(f'''
-                <div class="result-card" style="background: {config['gradient']};">
-                    {config['emoji']} {sentiment}
-                </div>
-                ''', unsafe_allow_html=True)
-                
-                # Additional details
-                st.markdown("### 📈 Detailed Analysis")
-                
-                col_pos, col_neu, col_neg = st.columns(3)
-                with col_pos:
-                    st.metric("Positive Score", f"{detailed_scores['pos']:.3f}")
-                with col_neu:
-                    st.metric("Neutral Score", f"{detailed_scores['neu']:.3f}")
-                with col_neg:
-                    st.metric("Negative Score", f"{detailed_scores['neg']:.3f}")
-                
-                st.metric("Compound Score", f"{compound:+.3f}", 
-                         help="Overall sentiment score (-1 to +1)")
+            sentiment, comp = vader_predict(user_text)
+            emoji = {"Positive":"😊","Neutral":"😐","Negative":"😞"}[sentiment]
+            grad = {
+                "Positive":"linear-gradient(135deg,#2ecc71 0%,#8E44AD 100%)",
+                "Neutral" :"linear-gradient(135deg,#ffffff 0%,#8E44AD 100%)",
+                "Negative":"linear-gradient(135deg,#e74c3c 0%,#8E44AD 100%)"
+            }[sentiment]
+            st.markdown(
+                f'<div class="result-card" style="background:{grad};">'
+                f'{emoji} {sentiment}'
+                '</div>',
+                unsafe_allow_html=True)
+            st.caption(f"VADER compound score: {comp:+.3f}")
 
-# ─── Information Section ─────────────────────────────────────
+    st.markdown("---")
+    st.markdown("## How It Works")
+    st.write(
+        "This app uses **VADER** (Valence Aware Dictionary and Sentiment Reasoner) "
+        "for accurate sentiment analysis. VADER is designed for social-media-style "
+        "text and understands emojis, slang and punctuation.")
+    st.markdown("## Tips for Better Results")
+    st.write(
+        "- Use full sentences for clearer context.\n"
+        "- Emojis and exclamation marks help convey tone.\n"
+        "- Very short fragments may be classified as Neutral.")
+
+with right:
+    st.markdown("## App Statistics")
+    st.metric("Dataset Size", f"{total_comments:,}")
+    st.metric("Model", "VADER")
+
+# ─── FOOTER ─────────────────────────────────────────────────
 st.markdown("---")
-st.markdown("## ℹ️ How It Works")
-
-col1, col2 = st.columns(2)
-
-with col1:
-    st.markdown("""
-    ### 🧠 VADER Sentiment Analysis
-    This app uses VADER (Valence Aware Dictionary and sEntiment Reasoner) for accurate sentiment analysis:
-    
-    - **Social Media Optimized**: Perfect for fan comments and casual language
-    - **Emoji Recognition**: Understands emojis and emoticons
-    - **Punctuation Aware**: Considers exclamation marks and capitalization
-    - **Real-time Processing**: Instant results with high accuracy
-    """)
-
-with col2:
-    st.markdown("""
-    ### 💡 Tips for Better Results
-    - Use complete sentences for more accurate analysis
-    - Include emojis to express your feelings
-    - Be specific about what you liked or disliked
-    - Natural language works best!
-    
-    **Example:**
-    - ✅ "I absolutely love their new choreography! 💜"
-    - ❌ "good song"
-    """)
-
-# ─── Footer ──────────────────────────────────────────────────
-st.markdown("---")
-st.markdown("""
-<div style='text-align: center; padding: 2rem; color: #8E44AD;'>
-    <p style='font-size: 1.2rem; font-weight: 600;'>
-        Built with 💜 for ARMY by ARMY
-    </p>
-    <p style='opacity: 0.8;'>
-        Powered by Streamlit & VADER Sentiment Analysis | © 2025
-    </p>
-</div>
-""", unsafe_allow_html=True)
+st.markdown(
+    "<div style='text-align:center;color:#8E44AD;'>"
+    "Built with 💜 using Streamlit & VADER • © 2025"
+    "</div>",
+    unsafe_allow_html=True)
