@@ -64,12 +64,19 @@ def load_data(path: str) -> pd.DataFrame:
     df = df.dropna(subset=["comment_text"]).reset_index(drop=True)
 
     # Pre-compute polarity & sentiment label
-    df["polarity"] = df["comment_text"].apply(lambda t: TextBlob(t).sentiment.polarity)
-    df["sentiment"] = df["polarity"].apply(
-        lambda p: "Positive" if p > 0 else ("Negative" if p < 0 else "Neutral")
-    )
-    return df
+    def better_label(p):
+        if p > 0.2:
+            return "Positive"
+        elif p < -0.2:
+            return "Negative"
+        else:
+            return "Neutral"
 
+    df["polarity"] = df["comment_text"].apply(lambda t: TextBlob(t).sentiment.polarity)
+    df["sentiment"] = df["polarity"].apply(better_label)
+
+    return df
+    
 @st.cache_resource(show_spinner=False)
 def train(df: pd.DataFrame):
     X = CountVectorizer(stop_words="english", max_features=3000).fit_transform(df.comment_text)
