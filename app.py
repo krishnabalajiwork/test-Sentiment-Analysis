@@ -33,9 +33,17 @@ h1,h2,h3,h4,h5,h6, .markdown-text-container * {{color:{DARK_TEXT} !important;}}
     background:#EFE6F7;
 }}
 [data-testid="stSidebar"] * {{color:{DARK_TEXT}!important;}}
-/* ensure metrics wrap instead of being cut off */
+
+/* ---------- METRICS (Fix for App Statistics) ---------- */
+[data-testid="stMetric"] {{
+    color:{DARK_TEXT} !important;
+}}
+[data-testid="stMetric"] * {{
+    color:{DARK_TEXT} !important;
+}}
 [data-testid="stMetric"] div {{
     white-space: normal;
+    color:{DARK_TEXT} !important;
 }}
 
 /* ---------- HEADER ---------- */
@@ -80,6 +88,7 @@ input[type='text']:focus {{
 }}
 </style>
 """, unsafe_allow_html=True)
+
 
 # ─── Helper: VADER prediction ────────────────────────────────
 def vader_predict(text):
