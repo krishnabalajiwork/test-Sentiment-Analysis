@@ -25,5 +25,3 @@ https://test-sentiment-analysis-bts.streamlit.app/
 Built for ARMY by ARMY using Streamlit and VADER sentiment analysis.
 
 ---
-
-**Note:** This version removes the image gallery from sidebar for a cleaner look.
