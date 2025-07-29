@@ -1,8 +1,4 @@
-streamlit==1.35.0
-pandas==2.2.2
-numpy==1.26.4
-scikit-learn==1.5.0
-textblob==0.17.1
-plotly==5.22.0
-python-dateutil==2.9.0
-pytz==2024.1
+streamlit>=1.35
+pandas>=2.2
+vaderSentiment>=3.3.2
+pathlib
