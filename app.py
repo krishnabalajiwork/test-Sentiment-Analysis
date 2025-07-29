@@ -119,7 +119,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ─── LAYOUT ─────────────────────────────────────────────────
-left, right = st.columns([12.5, 10.8])
+left, right = st.columns([1.5, 0.5])
 
 with left:
     st.markdown("### 📝 Enter your comment about BTS here...")
