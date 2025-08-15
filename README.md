@@ -51,6 +51,7 @@ An intuitive web app that:
 ## 🏗️ Technical Architecture
 
 **Sentiment Analysis Pipeline:**
+
 Comment Input → VADER Sentiment Engine → Result Display
 
 ↓ ↓ ↓
