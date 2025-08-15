@@ -51,3 +51,24 @@ An intuitive web app that:
 ## 🏗️ Technical Architecture
 
 **Sentiment Analysis Pipeline:**
+Comment Input → VADER Sentiment Engine → Result Display
+↓ ↓ ↓
+BTS Text Sentiment Scores Positive | Neutral | Negative
+
+
+**Tech Stack:**
+- **Frontend:** Streamlit
+- **Backend:** Python 3.8+
+- **NLP:** VADER
+- **Dataset:** BTS YouTube Comments (bts_2021_1.csv by seungguini)
+- **Version Control:** Git, GitHub
+- **Deployment:** Streamlit Cloud
+
+---
+
+## 🗃️ Dataset
+
+- **bts_2021_1.csv:** Real-world BTS comment data
+- **Credit:** Dataset compilation and inspiration by *seungguini*
+
+---
