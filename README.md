@@ -8,7 +8,7 @@
 
 ---
 
-## 💜 Project Overview
+## 💜 Project Ov erview
 
 **BTS Comment Sentiment Analyzer** is an easy-to-use app for ARMY to instantly analyze BTS-related comments, tweets, and posts for sentiment. Powered by VADER, it provides accurate breakdowns of positivity, negativity, and neutrality in fandom discussions.
 
