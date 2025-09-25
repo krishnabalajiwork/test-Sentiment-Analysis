@@ -14,8 +14,6 @@
 
 ---
 
-
-
 ## 🎯 Problem Statement
 
 BTS fans and creators need a simple way to measure the emotional tone in their community’s conversations, but online language can be complex:
